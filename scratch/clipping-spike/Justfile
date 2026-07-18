@@ -1,0 +1,27 @@
+default: selfcheck
+
+_spikedir := justfile_directory()
+_rootdir := parent_directory(parent_directory(_spikedir))
+
+# Self-check: clip a public element with no auth (validates the clipping mechanism).
+selfcheck:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	PW_BROWSERS="$(bash "{{_spikedir}}/scripts/pw-browsers-path")"
+	flox activate -d "{{_rootdir}}" -- bash -lc 'cd "{{_spikedir}}" && PLAYWRIGHT_BROWSERS_PATH="'"$PW_BROWSERS"'" python spike.py'
+
+# Authenticated flow (e.g. Cursor settings).
+login URL:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	PW_BROWSERS="$(bash "{{_spikedir}}/scripts/pw-browsers-path")"
+	flox activate -d "{{_rootdir}}" -- bash -lc 'cd "{{_spikedir}}" && PLAYWRIGHT_BROWSERS_PATH="'"$PW_BROWSERS"'" python demo.py login "$(URL)"'
+
+capture URL SELECTOR NAME:
+	#!/usr/bin/env bash
+	set -euo pipefail
+	PW_BROWSERS="$(bash "{{_spikedir}}/scripts/pw-browsers-path")"
+	flox activate -d "{{_rootdir}}" -- bash -lc 'cd "{{_spikedir}}" && PLAYWRIGHT_BROWSERS_PATH="'"$PW_BROWSERS"'" python demo.py capture "$(URL)" "$(SELECTOR)" "$(NAME)"'
+
+clean:
+	rm -rf "{{_spikedir}}/.demo-profile" "{{_spikedir}}/shots"

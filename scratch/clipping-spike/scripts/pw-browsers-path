@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+# Resolve the nixpkgs-built Playwright browsers linkFarm matching the
+# installed python313Packages.playwright version. Cached so subsequent
+# calls are fast; re-resolves when the cached path has been GC'd.
+set -euo pipefail
+
+CACHE=".flox/cache/playwright-browsers-path"
+
+if [ -f "$CACHE" ] && [ -d "$(cat "$CACHE")" ]; then
+  cat "$CACHE"
+  exit 0
+fi
+
+RESOLVED="$(nix build --no-link --print-out-paths nixpkgs#python313Packages.playwright.tests.browsers 2>/tmp/pw-resolve.log || true)"
+
+if [ -z "$RESOLVED" ] || [ ! -d "$RESOLVED" ]; then
+  echo "failed to build playwright browsers:" >&2
+  cat /tmp/pw-resolve.log >&2
+  exit 1
+fi
+
+mkdir -p "$(dirname "$CACHE")"
+printf '%s' "$RESOLVED" > "$CACHE"
+printf '%s' "$RESOLVED"

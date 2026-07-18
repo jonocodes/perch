@@ -1,0 +1,10 @@
+# Perch working artifacts (sessions + captures) — sensitive and ephemeral
+scratch/clipping-spike/.demo-profile/
+scratch/clipping-spike/shots/
+
+# Flox environment (kept local; reproducible from manifest when needed)
+.flox/
+
+# Editor / OS
+.DS_Store
+*.swp
